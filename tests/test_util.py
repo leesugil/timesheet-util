@@ -1,6 +1,6 @@
 import unittest
 import datetime, zoneinfo
-import shift
+from timesheet_util import util
 
 class TestMeasureOverlapTimedelta(unittest.TestCase):
 
@@ -46,7 +46,7 @@ class TestMeasureOverlapTimedelta(unittest.TestCase):
 
         for a, b, c, d, expected in cases:
             with self.subTest(a=a, b=b, c=c, d=d):
-                self.assertEqual(shift.measureOverlapTimedelta(a, b, c, d), expected)
+                self.assertEqual(util.measureOverlapTimedelta(a, b, c, d), expected)
 
 class TestMeasureOverlap(unittest.TestCase):
 
@@ -74,7 +74,7 @@ class TestMeasureOverlap(unittest.TestCase):
 
         for a, b, c, d, expected in cases:
             with self.subTest(a=a, b=b, c=c, d=d):
-                self.assertEqual(shift.measureOverlap(a, b, c, d), expected)
+                self.assertEqual(util.measureOverlap(a, b, c, d), expected)
 
 class TestIsInCheckInWindow(unittest.TestCase):
 
@@ -99,7 +99,7 @@ class TestIsInCheckInWindow(unittest.TestCase):
 
         for a, b, c, expected in cases:
             with self.subTest(a=a, b=b, c=c):
-                self.assertEqual(shift.isInCheckInWindow(a, b, c), expected)
+                self.assertEqual(util.isInCheckInWindow(a, b, c), expected)
 
 class TestIsInCheckOutWindow(unittest.TestCase):
 
@@ -124,7 +124,7 @@ class TestIsInCheckOutWindow(unittest.TestCase):
 
         for a, b, c, expected in cases:
             with self.subTest(a=a, b=b, c=c):
-                self.assertEqual(shift.isInCheckOutWindow(a, b, c), expected)
+                self.assertEqual(util.isInCheckOutWindow(a, b, c), expected)
 
 if __name__ == '__main__':
     unittest.main()
