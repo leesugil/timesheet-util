@@ -7,3 +7,23 @@ build-backend = "setuptools.build_meta"
 # For smarter version schemes and other configuration options,
 # check out https://github.com/pypa/setuptools_scm
 version_scheme = "no-guess-dev"
+
+[project]
+name = "timesheet-util"
+version = "0.0.1"
+authors = [
+  { name="Sugil Steve Lee", email="sugilmath@gmail.com" },
+]
+description = "Various tools for timesheet recording"
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+license = "MIT"
+license-files = ["LICEN[CS]E*"]
+
+[project.urls]
+Homepage = "https://github.com/leesugil/timesheet-util"
+Issues = "https://github.com/leesugil/timesheet-util/issues"
