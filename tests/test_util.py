@@ -46,7 +46,7 @@ class TestMeasureOverlapTimedelta(unittest.TestCase):
 
         for a, b, c, d, expected in cases:
             with self.subTest(a=a, b=b, c=c, d=d):
-                self.assertEqual(util.measureOverlapTimedelta(a, b, c, d), expected)
+                self.assertEqual(util.measure_overlap_timedelta(a, b, c, d), expected)
 
 class TestMeasureOverlap(unittest.TestCase):
 
@@ -74,7 +74,7 @@ class TestMeasureOverlap(unittest.TestCase):
 
         for a, b, c, d, expected in cases:
             with self.subTest(a=a, b=b, c=c, d=d):
-                self.assertEqual(util.measureOverlap(a, b, c, d), expected)
+                self.assertEqual(util.measure_overlap(a, b, c, d), expected)
 
 class TestIsInCheckInWindow(unittest.TestCase):
 
@@ -95,11 +95,16 @@ class TestIsInCheckInWindow(unittest.TestCase):
                  datetime.datetime(2026, 1, 1, 0, 0, 0, tzinfo=zoneinfo.ZoneInfo("America/New_York")),
                  datetime.timedelta(minutes=30),
                  False),
+                # edge
+                (datetime.datetime(2026, 1, 1, 0, 0, 0, tzinfo=zoneinfo.ZoneInfo("America/New_York")),
+                 datetime.datetime(2026, 1, 1, 0, 0, 0, tzinfo=zoneinfo.ZoneInfo("America/New_York")),
+                 datetime.timedelta(minutes=30),
+                 True),
                 ]
 
         for a, b, c, expected in cases:
             with self.subTest(a=a, b=b, c=c):
-                self.assertEqual(util.isInCheckInWindow(a, b, c), expected)
+                self.assertEqual(util.is_in_check_in_window(a, b, c), expected)
 
 class TestIsInCheckOutWindow(unittest.TestCase):
 
@@ -120,11 +125,141 @@ class TestIsInCheckOutWindow(unittest.TestCase):
                  datetime.datetime(2026, 1, 1, 0, 0, 0, tzinfo=zoneinfo.ZoneInfo("America/New_York")),
                  datetime.timedelta(minutes=30),
                  False),
+                # edge
+                (datetime.datetime(2026, 1, 1, 0, 30, 0, tzinfo=zoneinfo.ZoneInfo("America/New_York")),
+                 datetime.datetime(2026, 1, 1, 0, 0, 0, tzinfo=zoneinfo.ZoneInfo("America/New_York")),
+                 datetime.timedelta(minutes=30),
+                 True),
                 ]
 
         for a, b, c, expected in cases:
             with self.subTest(a=a, b=b, c=c):
-                self.assertEqual(util.isInCheckOutWindow(a, b, c), expected)
+                self.assertEqual(util.is_in_check_out_window(a, b, c), expected)
+
+class TestCheckInTime(unittest.TestCase):
+
+    def test_cases(self):
+        cases = [
+                # ordinary
+                (datetime.datetime(2025, 12, 31, 23, 55, 22, tzinfo=zoneinfo.ZoneInfo("America/New_York")),
+                 datetime.datetime(2026, 1, 1, 0, 0, 0, tzinfo=zoneinfo.ZoneInfo("America/New_York")),
+                 datetime.timedelta(minutes=30),
+                 datetime.datetime(2026, 1, 1, 0, 0, 0, tzinfo=zoneinfo.ZoneInfo("America/New_York"))),
+                # edge
+                (datetime.datetime(2025, 12, 31, 23, 30, 0, tzinfo=zoneinfo.ZoneInfo("America/New_York")),
+                 datetime.datetime(2026, 1, 1, 0, 0, 0, tzinfo=zoneinfo.ZoneInfo("America/New_York")),
+                 datetime.timedelta(minutes=30),
+                 datetime.datetime(2026, 1, 1, 0, 0, 0, tzinfo=zoneinfo.ZoneInfo("America/New_York"))),
+                (datetime.datetime(2026, 1, 1, 0, 0, 0, tzinfo=zoneinfo.ZoneInfo("America/New_York")),
+                 datetime.datetime(2026, 1, 1, 0, 0, 0, tzinfo=zoneinfo.ZoneInfo("America/New_York")),
+                 datetime.timedelta(minutes=30),
+                 datetime.datetime(2026, 1, 1, 0, 0, 0, tzinfo=zoneinfo.ZoneInfo("America/New_York"))),
+                # early
+                (datetime.datetime(2025, 12, 31, 23, 29, 59, tzinfo=zoneinfo.ZoneInfo("America/New_York")),
+                 datetime.datetime(2026, 1, 1, 0, 0, 0, tzinfo=zoneinfo.ZoneInfo("America/New_York")),
+                 datetime.timedelta(minutes=30),
+                 datetime.datetime(2025, 12, 31, 23, 29, 59, tzinfo=zoneinfo.ZoneInfo("America/New_York"))),
+                # late
+                (datetime.datetime(2026, 1, 1, 0, 0, 1, tzinfo=zoneinfo.ZoneInfo("America/New_York")),
+                 datetime.datetime(2026, 1, 1, 0, 0, 0, tzinfo=zoneinfo.ZoneInfo("America/New_York")),
+                 datetime.timedelta(minutes=30),
+                 datetime.datetime(2026, 1, 1, 0, 0, 1, tzinfo=zoneinfo.ZoneInfo("America/New_York"))),
+                ]
+
+        for a, b, c, expected in cases:
+            with self.subTest(a=a, b=b, c=c):
+                self.assertEqual(util.check_in_time(a, b, c), expected)
+
+class TestCheckOutTime(unittest.TestCase):
+
+    def test_cases(self):
+        cases = [
+                # ordinary
+                (datetime.datetime(2026, 1, 1, 0, 0, 22, tzinfo=zoneinfo.ZoneInfo("America/New_York")),
+                 datetime.datetime(2026, 1, 1, 0, 0, 0, tzinfo=zoneinfo.ZoneInfo("America/New_York")),
+                 datetime.timedelta(minutes=30),
+                 datetime.datetime(2026, 1, 1, 0, 0, 0, tzinfo=zoneinfo.ZoneInfo("America/New_York"))),
+                # edge
+                (datetime.datetime(2026, 1, 1, 0, 0, 0, tzinfo=zoneinfo.ZoneInfo("America/New_York")),
+                 datetime.datetime(2026, 1, 1, 0, 0, 0, tzinfo=zoneinfo.ZoneInfo("America/New_York")),
+                 datetime.timedelta(minutes=30),
+                 datetime.datetime(2026, 1, 1, 0, 0, 0, tzinfo=zoneinfo.ZoneInfo("America/New_York"))),
+                (datetime.datetime(2026, 1, 1, 0, 30, 0, tzinfo=zoneinfo.ZoneInfo("America/New_York")),
+                 datetime.datetime(2026, 1, 1, 0, 0, 0, tzinfo=zoneinfo.ZoneInfo("America/New_York")),
+                 datetime.timedelta(minutes=30),
+                 datetime.datetime(2026, 1, 1, 0, 0, 0, tzinfo=zoneinfo.ZoneInfo("America/New_York"))),
+                # early
+                (datetime.datetime(2025, 12, 31, 23, 59, 59, tzinfo=zoneinfo.ZoneInfo("America/New_York")),
+                 datetime.datetime(2026, 1, 1, 0, 0, 0, tzinfo=zoneinfo.ZoneInfo("America/New_York")),
+                 datetime.timedelta(minutes=30),
+                 datetime.datetime(2025, 12, 31, 23, 59, 59, tzinfo=zoneinfo.ZoneInfo("America/New_York"))),
+                # late
+                (datetime.datetime(2026, 1, 1, 0, 30, 1, tzinfo=zoneinfo.ZoneInfo("America/New_York")),
+                 datetime.datetime(2026, 1, 1, 0, 0, 0, tzinfo=zoneinfo.ZoneInfo("America/New_York")),
+                 datetime.timedelta(minutes=30),
+                 datetime.datetime(2026, 1, 1, 0, 30, 1, tzinfo=zoneinfo.ZoneInfo("America/New_York"))),
+                ]
+
+        for a, b, c, expected in cases:
+            with self.subTest(a=a, b=b, c=c):
+                self.assertEqual(util.check_out_time(a, b, c), expected)
+
+class TestRoundTimeByMinute(unittest.TestCase):
+
+    def test_cases(self):
+        cases = [
+                # ordinary
+                (datetime.datetime(2026, 1, 1, 0, 0, 22, tzinfo=zoneinfo.ZoneInfo("America/New_York")),
+                 5,
+                 'up',
+                 datetime.datetime(2026, 1, 1, 0, 5, 0, tzinfo=zoneinfo.ZoneInfo("America/New_York"))),
+                (datetime.datetime(2026, 1, 1, 0, 0, 22, tzinfo=zoneinfo.ZoneInfo("America/New_York")),
+                 5,
+                 'down',
+                 datetime.datetime(2026, 1, 1, 0, 0, 0, tzinfo=zoneinfo.ZoneInfo("America/New_York"))),
+                (datetime.datetime(2026, 1, 1, 0, 0, 22, tzinfo=zoneinfo.ZoneInfo("America/New_York")),
+                 5,
+                 'round',
+                 datetime.datetime(2026, 1, 1, 0, 0, 0, tzinfo=zoneinfo.ZoneInfo("America/New_York"))),
+                (datetime.datetime(2026, 1, 1, 0, 4, 22, tzinfo=zoneinfo.ZoneInfo("America/New_York")),
+                 5,
+                 'round',
+                 datetime.datetime(2026, 1, 1, 0, 5, 0, tzinfo=zoneinfo.ZoneInfo("America/New_York"))),
+                # edge
+                (datetime.datetime(2026, 1, 1, 0, 0, 0, tzinfo=zoneinfo.ZoneInfo("America/New_York")),
+                 5,
+                 'up',
+                 datetime.datetime(2026, 1, 1, 0, 0, 0, tzinfo=zoneinfo.ZoneInfo("America/New_York"))),
+                (datetime.datetime(2026, 1, 1, 0, 5, 0, tzinfo=zoneinfo.ZoneInfo("America/New_York")),
+                 5,
+                 'up',
+                 datetime.datetime(2026, 1, 1, 0, 5, 0, tzinfo=zoneinfo.ZoneInfo("America/New_York"))),
+                (datetime.datetime(2026, 1, 1, 0, 0, 0, tzinfo=zoneinfo.ZoneInfo("America/New_York")),
+                 5,
+                 'down',
+                 datetime.datetime(2026, 1, 1, 0, 0, 0, tzinfo=zoneinfo.ZoneInfo("America/New_York"))),
+                (datetime.datetime(2026, 1, 1, 0, 5, 0, tzinfo=zoneinfo.ZoneInfo("America/New_York")),
+                 5,
+                 'down',
+                 datetime.datetime(2026, 1, 1, 0, 5, 0, tzinfo=zoneinfo.ZoneInfo("America/New_York"))),
+                (datetime.datetime(2026, 1, 1, 0, 2, 30, tzinfo=zoneinfo.ZoneInfo("America/New_York")),
+                 5,
+                 'round',
+                 datetime.datetime(2026, 1, 1, 0, 5, 0, tzinfo=zoneinfo.ZoneInfo("America/New_York"))),
+                (datetime.datetime(2026, 1, 1, 0, 0, 0, tzinfo=zoneinfo.ZoneInfo("America/New_York")),
+                 3,
+                 'round',
+                 datetime.datetime(2026, 1, 1, 0, 0, 0, tzinfo=zoneinfo.ZoneInfo("America/New_York"))),
+                (datetime.datetime(2026, 1, 1, 0, 3, 0, tzinfo=zoneinfo.ZoneInfo("America/New_York")),
+                 3,
+                 'round',
+                 datetime.datetime(2026, 1, 1, 0, 3, 0, tzinfo=zoneinfo.ZoneInfo("America/New_York"))),
+                ]
+
+        for a, b, c, expected in cases:
+            with self.subTest(a=a, b=b, c=c):
+                print(a, b, c, expected)
+                self.assertEqual(util.round_time_by_minute(a, b, c), expected)
 
 if __name__ == '__main__':
     unittest.main()
